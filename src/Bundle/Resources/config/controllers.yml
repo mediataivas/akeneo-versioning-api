@@ -1,0 +1,12 @@
+services:
+  Vincit\VersioningApi\Bundle\Controller\VersioningApiController:
+    public: true
+    class: 'Vincit\VersioningApi\Bundle\Controller\VersioningApiController'
+    arguments:
+      - '@security.token_storage'
+      - '@oro_security.security_facade'
+      - '@logger'
+      - '@pim_versioning.repository.version'
+      - '@database_connection'
+    calls:
+      - [ 'setContainer', [ '@service_container' ] ]
