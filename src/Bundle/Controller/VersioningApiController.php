@@ -5,6 +5,7 @@ namespace Vincit\VersioningApi\Bundle\Controller;
 use Akeneo\Tool\Bundle\VersioningBundle\Doctrine\ORM\VersionRepository;
 use Akeneo\UserManagement\Component\Model\UserInterface;
 use Doctrine\DBAL\Connection;
+use InvalidArgumentException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -42,8 +43,9 @@ class VersioningApiController extends AbstractController
         $this->denyAccessUnlessAclIsGranted('pim_api_product_list');
 
         $response = new JsonResponse();
-        $search = $request->query->get('search');
-        if ($search) {
+
+        if ($request->query->has('search')) {
+            $search = $request->query->get('search');
             $search = json_decode($search, true);
             $qb = $this->connection->createQueryBuilder();
             $qb->select('*')
@@ -53,6 +55,7 @@ class VersioningApiController extends AbstractController
             if ($search['logged_at'] ?? false) {
                 foreach ($search['logged_at'] as $i => $item) {
                     $condition = false;
+                    $value = $item['value'];
                     switch ($item['operator']) {
                         case '=':
                             $condition = $qb->expr()->eq('logged_at', ':logged_at_' . $i);
@@ -67,11 +70,29 @@ class VersioningApiController extends AbstractController
                             $condition = $qb->expr()->gte('logged_at', ':logged_at_' . $i);
                             break;
                         case 'BETWEEN':
-                        case 'NOT BETWEEN':
+                            if (!is_array($item['value']) || count($item['value']) !== 2) {
+                                throw new InvalidArgumentException("This operator needs two date values");
+                            }
+                            $date1 = $item['value'][0];
+                            $date2 = $item['value'][1];
+                            // Add first date, well, first
+                            $condition = $qb->expr()->gte('logged_at', ':logged_at_' . $i . '_1');
+                            $qb->andWhere($condition);
+                            $qb->setParameter(':logged_at_' . $i . '_1', $date1);
+                            // The second date is added the same way as every other condition
+                            $condition = $qb->expr()->lte('logged_at', ':logged_at_' . $i);
+                            $value = $date2;
+                            break;
                         case 'SINCE LAST N DAYS':
+                            $condition = $qb->expr()->gte('logged_at', ':logged_at_' . $i);
+                            $value = date_format(
+                                new \DateTimeImmutable(sprintf('%s days ago', $value)),
+                                'Y-m-d H:i:s'
+                            );
+
                     }
                     $condition && $qb->andWhere($condition);
-                    $qb->setParameter(':logged_at_' . $i, $item['value']);
+                    $qb->setParameter(':logged_at_' . $i, $value);
                 }
             }
 
@@ -93,7 +114,6 @@ class VersioningApiController extends AbstractController
                 }
                 $result[] = $item;
             }
-
 
             $response->setData($result);
         }
