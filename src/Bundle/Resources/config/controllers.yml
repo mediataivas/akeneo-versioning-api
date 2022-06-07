@@ -1,7 +1,7 @@
 services:
-  Vincit\VersioningApi\Bundle\Controller\VersioningApiController:
+  Vincit\VersioningApi\Bundle\Controller\Rest\VersioningApiController:
     public: true
-    class: 'Vincit\VersioningApi\Bundle\Controller\VersioningApiController'
+    class: 'Vincit\VersioningApi\Bundle\Controller\Rest\VersioningApiController'
     arguments:
       - '@security.token_storage'
       - '@oro_security.security_facade'
@@ -10,3 +10,9 @@ services:
       - '@database_connection'
     calls:
       - [ 'setContainer', [ '@service_container' ] ]
+    tags:
+      - { name: controller.service_arguments }
+
+  versioning.api.rest.controller:
+    alias: Vincit\VersioningApi\Bundle\Controller\Rest\VersioningApiController
+    public: true

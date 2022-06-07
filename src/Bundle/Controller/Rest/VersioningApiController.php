@@ -1,6 +1,6 @@
 <?php
 
-namespace Vincit\VersioningApi\Bundle\Controller;
+namespace Vincit\VersioningApi\Bundle\Controller\Rest;
 
 use Akeneo\Tool\Bundle\VersioningBundle\Doctrine\ORM\VersionRepository;
 use Akeneo\UserManagement\Component\Model\UserInterface;
@@ -39,7 +39,7 @@ class VersioningApiController extends AbstractController
     }
     
     #[Route('/', name: 'version_list', methods: ['GET'])]
-    public function list(Request $request): JsonResponse {
+    public function listAction(Request $request): JsonResponse {
         $this->denyAccessUnlessAclIsGranted('pim_api_product_list');
 
         $response = new JsonResponse();

@@ -1,0 +1,15 @@
+versioning_api_rest_controller:
+  path: /api/rest/v1/versioning
+  methods: ["GET"]
+  defaults: {_controller: versioning.api.rest.controller:listAction}
+
+versioning_api_internal_controller:
+  path: /rest/versioning
+  methods: ["GET"]
+  defaults: {_controller: versioning.api.rest.controller:listAction}
+
+versioning_api_pages_index:
+  path: /versioning
+  methods: ["GET"]
+  controller: versioning_api_pages_index
+

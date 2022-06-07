@@ -1,0 +1,9 @@
+config:
+  config:
+    pim/controller-registry:
+      controllers:
+        versioning_api_pages_index:
+          module: versioningapi/js/controller/index
+
+    paths:
+      versioningapi/js/controller/index: versioningapi/js/controller/index.tsx

@@ -1,0 +1,11 @@
+extensions:
+  pim-menu-versioning:
+    module: pim/menu/tab
+    parent: pim-menu
+    position: 120
+    targetZone: mainMenu
+    config:
+      title: "Versioning"
+      iconModifier: iconCard
+      icon: CardIcon
+      to: versioning_api_pages_index
