@@ -44,13 +44,24 @@ class VersioningApiController extends AbstractController
 
         $response = new JsonResponse();
 
+        $type = 'Akeneo\Pim\Enrichment\Component\Product\Model\Product';
+
         if ($request->query->has('search')) {
             $search = $request->query->get('search');
             $search = json_decode($search, true);
             $qb = $this->connection->createQueryBuilder();
             $qb->select('*')
                 ->where($qb->expr()->eq('resource_name', ':resource_name'))
+                ->orderBy('id', 'desc')
                 ->from('pim_versioning_version');
+            if ($request->query->has('pager')) {
+                $pager = $request->query->get('pager');
+                $pager = json_decode($pager, true);
+                $page = $pager['page'] ?? 1;
+                $limit = $pager['per_page'] ?? 25;
+                $qb->setFirstResult(($page - 1) * $limit);
+                $qb->setMaxResults($limit);
+            }
 
             if ($search['logged_at'] ?? false) {
                 foreach ($search['logged_at'] as $i => $item) {
@@ -96,26 +107,48 @@ class VersioningApiController extends AbstractController
                 }
             }
 
-            $qb->setParameter(':resource_name', 'Akeneo\Pim\Enrichment\Component\Product\Model\Product');
+            $qb->setParameter(':resource_name', $type);
 
             if ($search['field'] ?? false) {
                 if (!is_array($search['field'])) {
                     $search['field'] = [$search['field']];
                 }
             }
+            $fieldLikes = [];
+            foreach ($search['field'] as $i => $field) {
+                $expression = $qb->expr()->like('changeset', ':field_' . $i);
+                $fieldLikes[] = $expression;
+                $qb->setParameter(':field_' . $i, '%"' . $field . '%');
+            }
+            if (!empty($fieldLikes)) {
+                $qb->andWhere(
+                    $qb->expr()->or(
+                        ...$fieldLikes
+                    )
+                );
+            }
             $result = [];
             foreach ($qb->execute()->iterateAssociative() as $item) {
                 $item['changeset'] = unserialize($item['changeset']);
-                if ($search['field'] ?? false) {
+                /*if ($search['field'] ?? false) {
                     // Check if changeset includes any of the requested fields
                     if (!array_intersect($search['field'], array_keys($item['changeset']))) {
                         continue;
                     }
-                }
+                }*/
                 $result[] = $item;
             }
 
-            $response->setData($result);
+            $qb->resetQueryPart('select');
+            $qb->setMaxResults(null);
+            $qb->setFirstResult(0);
+            $qb->select('COUNT(*)');
+            $tmp = $qb->execute()->fetchNumeric() ?: [];
+            $count = reset($tmp);
+            $response->setData([
+                'total' => (int)$count,
+                'items' => $result
+            ]);
         }
         return $response;
     }
