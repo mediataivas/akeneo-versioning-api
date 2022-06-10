@@ -92,7 +92,7 @@ const VersioningBrowser = () => {
                 >
                     {attributeOptions && attributeOptions.map((item) => {
                         return <MultiSelectInput.Option key={item.code} value={item.code}>
-                            {item.labels['en_US'] + ' [' + item.code + ']'}
+                            {(item.labels['fi_FI'] ?? item.labels['en_US'] ?? Object.values(item.labels)[0]) + ' [' + item.code + ']'}
                         </MultiSelectInput.Option>
                     })
                     }
