@@ -29,7 +29,9 @@ const VersioningBrowser = () => {
     const versioningApiRoute = useRoute('versioning_api_internal_controller');
     const router = useRouter();
     const [attributeOptions, setAttributeOptions] = useState();
+    const [userOptions, setUserOptions] = useState();
     const [attributeValues, setAttributeValues] = useState<string[]>([]);
+    const [userValues, setUserValues] = useState<string[]>([]);
     const [startDate, setStartDate] = useState(subWeeks(new Date(), 1));
     const [endDate, setEndDate] = useState(new Date());
     const [isOpen, setIsOpen] = useState(true);
@@ -41,6 +43,15 @@ const VersioningBrowser = () => {
             const attributes = await fetch(attributeApiRoute + '?options[limit]=9001');
             const attributeJson = await attributes.json();
             setAttributeOptions(attributeJson);
+            const users = await fetch('/datagrid/pim-user-grid/load');
+            let usersJson = await users.json();
+            usersJson = JSON.parse(usersJson.data);
+            usersJson.data[usersJson.data.length + 1] = {
+                username: 'system',
+                firstName: 'Akeneo',
+                lastName: 'Backend'
+            }
+            setUserOptions(usersJson.data);
         }
         initialize();
     }, []);
@@ -53,6 +64,7 @@ const VersioningBrowser = () => {
     const doSearch = async () => {
         const query = {
             field: attributeValues,
+            author: userValues,
             logged_at: [
                 {
                     operator: 'BETWEEN',
@@ -69,6 +81,9 @@ const VersioningBrowser = () => {
         };
         const response = await fetch(versioningApiRoute + '?search=' + JSON.stringify(query) + '&pager=' + JSON.stringify(paging));
         const responseJson = await response.json();
+        if (responseJson.total === 0) {
+            setCurrentPage(0);
+        }
         setNumResults(responseJson.total);
         setRevisions(responseJson.items);
     }
@@ -120,6 +135,22 @@ const VersioningBrowser = () => {
                     minDate={startDate}
                     className="AknFilterBox-filter"
                 />
+                <MultiSelectInput
+                    placeholder="Select author"
+                    emptyResultLabel=""
+                    onChange={(newValue: string[]) => {setUserValues(newValue)}}
+                    value={userValues}
+                    className="AknFilterBox-filter"
+                >
+                {userOptions && userOptions.map((user) => {
+                    return <MultiSelectInput.Option
+                        key={user.username}
+                        value={user.username}
+                    >
+                        {user.firstName.concat(' ', user.lastName, ' [', user.username, ']')}
+                    </MultiSelectInput.Option>
+                })}
+                </MultiSelectInput>
                 <Button
                     //disabled={attributeValues?.length === 0}
                     onClick={() => {

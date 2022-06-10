@@ -127,6 +127,17 @@ class VersioningApiController extends AbstractController
                     )
                 );
             }
+
+            if ($search['author'] ?? false) {
+                if (!is_array($search['author'])) {
+                    $search['author'] = [$search['author']];
+                }
+                $qb->andWhere(
+                    $qb->expr()->in('author', ':author')
+                );
+                $qb->setParameter(':author', $search['author'], \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+            }
+
             $result = [];
             foreach ($qb->execute()->iterateAssociative() as $item) {
                 $item['changeset'] = unserialize($item['changeset']);
