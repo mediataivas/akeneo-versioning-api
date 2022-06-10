@@ -1,5 +1,6 @@
 {
   "name": "vincit/versioning-api",
+  "version": "1.0.0",
   "description": "description",
   "minimum-stability": "stable",
   "license": "proprietary",
@@ -10,7 +11,7 @@
     }
   ],
   "require": {
-    "php": "7.4.*|8.0.*"
+    "akeneo/pim-community-dev": "^6.0.0"
   },
   "autoload": {
     "psr-4": {

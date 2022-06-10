@@ -130,6 +130,7 @@ class VersioningApiController extends AbstractController
             $result = [];
             foreach ($qb->execute()->iterateAssociative() as $item) {
                 $item['changeset'] = unserialize($item['changeset']);
+                $item['snapshot'] = unserialize($item['snapshot']);
                 /*if ($search['field'] ?? false) {
                     // Check if changeset includes any of the requested fields
                     if (!array_intersect($search['field'], array_keys($item['changeset']))) {

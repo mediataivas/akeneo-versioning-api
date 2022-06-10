@@ -1,18 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import styled from "styled-components";
-import {PageContent, PageHeader, useRoute, useTranslate, PimView} from '@akeneo-pim-community/shared';
+import {PageContent, PageHeader, useRoute, useRouter, useTranslate, PimView} from '@akeneo-pim-community/shared';
 import {
     Breadcrumb,
     Button,
+    Link,
+    MultiSelectInput,
     Pagination,
-    Search,
     SectionTitle,
     SubNavigationPanel,
-    Table,
-    MultiSelectInput
+    Table
 } from 'akeneo-design-system';
 import DatePicker from 'react-datepicker';
-import {format, subMonths} from 'date-fns';
+import {format, subWeeks} from 'date-fns';
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -27,9 +27,10 @@ const VersioningBrowser = () => {
     const versioningHomeRoute = useRoute('versioning_api_pages_index');
     const attributeApiRoute = useRoute('pim_enrich_attribute_rest_index');
     const versioningApiRoute = useRoute('versioning_api_internal_controller');
+    const router = useRouter();
     const [attributeOptions, setAttributeOptions] = useState();
     const [attributeValues, setAttributeValues] = useState<string[]>([]);
-    const [startDate, setStartDate] = useState(subMonths(new Date(), 1));
+    const [startDate, setStartDate] = useState(subWeeks(new Date(), 1));
     const [endDate, setEndDate] = useState(new Date());
     const [isOpen, setIsOpen] = useState(true);
     const [revisions, setRevisions] = useState([]);
@@ -120,9 +121,13 @@ const VersioningBrowser = () => {
                     className="AknFilterBox-filter"
                 />
                 <Button
-                    disabled={attributeValues?.length === 0}
+                    //disabled={attributeValues?.length === 0}
                     onClick={() => {
-                        setCurrentPage(0);
+                        if (currentPage !== 1) {
+                            setCurrentPage(1);
+                        } else {
+                            doSearch();
+                        }
                     }}
                     className="AknFilterBox-filter"
                 >Search</Button>
@@ -151,14 +156,10 @@ const VersioningBrowser = () => {
                             }}
                             totalItems={numResults}
                         />
-                        <Search
-                            searchValue={''}
-                            onSearchChange={function (searchValue: string): void {
-                                console.log(searchValue);
-                            }}/>
                         <Table>
                             <Table.Header>
                                 <Table.HeaderCell>Date</Table.HeaderCell>
+                                <Table.HeaderCell>Author</Table.HeaderCell>
                                 <Table.HeaderCell>Resource</Table.HeaderCell>
                                 <Table.HeaderCell>Changes</Table.HeaderCell>
                             </Table.Header>
@@ -168,7 +169,17 @@ const VersioningBrowser = () => {
                                         return (
                                             <Table.Row key={"row" + index}>
                                                 <Table.Cell>{item.logged_at}</Table.Cell>
-                                                <Table.Cell>{item.resource_id}</Table.Cell>
+                                                <Table.Cell>{item.author}</Table.Cell>
+                                                <Table.Cell>
+                                                    <Link
+                                                        href={`#${
+                                                            router.generate(
+                                                                'pim_enrich_product_edit',
+                                                                {id: item.resource_id}
+                                                            )
+                                                        }`}
+                                                    >{item.snapshot.name}</Link>
+                                                </Table.Cell>
                                                 <Table.Cell><pre>{JSON.stringify(item.changeset, null, 2)}</pre></Table.Cell>
                                             </Table.Row>
                                         );
