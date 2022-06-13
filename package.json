@@ -1,6 +1,6 @@
 {
   "name": "VersioningApi",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "dependencies": {
     "react-datepicker": "^4.8.0"
