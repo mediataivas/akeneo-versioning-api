@@ -4,5 +4,8 @@
   "private": true,
   "dependencies": {
     "react-datepicker": "^4.8.0"
+  },
+  "devDependencies": {
+    "@types/react-datepicker": "^4.4.2"
   }
 }

@@ -209,7 +209,13 @@ const VersioningBrowser = () => {
                                                                 {id: item.resource_id}
                                                             )
                                                         }`}
-                                                    >{item.snapshot.name}</Link>
+                                                    >{
+                                                        item.snapshot['name-fi_FI'] ??
+                                                        item.snapshot['name-en_US'] ??
+                                                        item.snapshot['name'] ??
+                                                        item.snapshot['sku'] ??
+                                                        item.resource_id
+                                                    }</Link>
                                                 </Table.Cell>
                                                 <Table.Cell><pre>{JSON.stringify(item.changeset, null, 2)}</pre></Table.Cell>
                                             </Table.Row>
