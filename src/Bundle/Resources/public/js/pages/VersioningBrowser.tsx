@@ -13,6 +13,7 @@ import {
 } from 'akeneo-design-system';
 import DatePicker from 'react-datepicker';
 import {format, subWeeks} from 'date-fns';
+import {RevisionItem} from '../types/types';
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -21,6 +22,10 @@ const ContentWrapper = styled.div`
     flex-direction: column;
     width: 100%;`
 const PageWrapper = styled.div``
+const NoResultWrapper = styled.div`
+    padding: 0 40px;
+`
+
 
 const VersioningBrowser = () => {
     const translate = useTranslate();
@@ -196,7 +201,7 @@ const VersioningBrowser = () => {
                             </Table.Header>
                             <Table.Body>
                                 {revisions
-                                    .map((item, index) => {
+                                    .map((item: RevisionItem, index) => {
                                         return (
                                             <Table.Row key={"row" + index}>
                                                 <Table.Cell>{item.logged_at}</Table.Cell>
@@ -227,7 +232,7 @@ const VersioningBrowser = () => {
                     </PageContent>
                 }
                 { revisions.length === 0 &&
-                    <>No results</>
+                    <NoResultWrapper>{translate('pim_common.no_search_result')}</NoResultWrapper>
                 }
             </ContentWrapper>
         </PageWrapper>
