@@ -33,14 +33,14 @@ const VersioningBrowser = () => {
     const attributeApiRoute = useRoute('pim_enrich_attribute_rest_index');
     const versioningApiRoute = useRoute('versioning_api_internal_controller');
     const router = useRouter();
-    const [attributeOptions, setAttributeOptions] = useState();
-    const [userOptions, setUserOptions] = useState();
+    const [attributeOptions, setAttributeOptions] = useState<Array<any>>();
+    const [userOptions, setUserOptions] = useState<Array<any>>();
     const [attributeValues, setAttributeValues] = useState<string[]>([]);
     const [userValues, setUserValues] = useState<string[]>([]);
     const [startDate, setStartDate] = useState(subWeeks(new Date(), 1));
     const [endDate, setEndDate] = useState(new Date());
     const [isOpen, setIsOpen] = useState(true);
-    const [revisions, setRevisions] = useState([]);
+    const [revisions, setRevisions] = useState<RevisionItem[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [numResults, setNumResults] = useState(0);
     useEffect(() => {
@@ -108,6 +108,8 @@ const VersioningBrowser = () => {
                     onChange={(newValue: string[]) => {setAttributeValues(newValue)}}
                     placeholder="Select attributes to search for"
                     value={attributeValues}
+                    openLabel=""
+                    removeLabel=""
                     className="AknFilterBox-filter"
                 >
                     {attributeOptions && attributeOptions.map((item) => {
@@ -146,6 +148,8 @@ const VersioningBrowser = () => {
                     onChange={(newValue: string[]) => {setUserValues(newValue)}}
                     value={userValues}
                     className="AknFilterBox-filter"
+                    openLabel=""
+                    removeLabel=""
                 >
                 {userOptions && userOptions.map((user) => {
                     return <MultiSelectInput.Option
