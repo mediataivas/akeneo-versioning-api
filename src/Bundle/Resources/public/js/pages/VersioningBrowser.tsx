@@ -94,7 +94,7 @@ const VersioningBrowser = () => {
     }
 
     return (
-        <PageWrapper className="AknDefault-contentWithColumn">
+        <PageWrapper id="versioning-browser" className="AknDefault-contentWithColumn">
             <SubNavigationPanel
                 open={() => setIsOpen(true)}
                 close={() => setIsOpen(false)}
